@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-commerce API Checklist | Interactive</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      /* Header */
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px 40px;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .stats {
+        display: flex;
+        gap: 24px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 12px 24px;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+      }
+
+      .stat-card .number {
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .stat-card .label {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      /* Controls */
+      .controls {
+        padding: 20px 40px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .search-box {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 10px 16px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+
+      .filter-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .filter-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+        background: white;
+        border: 1px solid #dee2e6;
+      }
+
+      .filter-btn.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+      }
+
+      .filter-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .progress-bar-container {
+        background: #e9ecef;
+        border-radius: 20px;
+        height: 8px;
+        flex: 1;
+        min-width: 150px;
+      }
+
+      .progress-bar {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        height: 100%;
+        border-radius: 20px;
+        transition: width 0.3s ease;
+        width: 0%;
+      }
+
+      /* Checklist */
+      .checklist {
+        padding: 20px 40px;
+        max-height: 65vh;
+        overflow-y: auto;
+      }
+
+      .module {
+        margin-bottom: 32px;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .module-header {
+        background: #f8f9fa;
+        padding: 16px 20px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        font-size: 18px;
+        border-bottom: 2px solid #667eea;
+      }
+
+      .module-header:hover {
+        background: #e9ecef;
+      }
+
+      .module-stats {
+        font-size: 14px;
+        color: #6c757d;
+        font-weight: normal;
+      }
+
+      .module-content {
+        display: block;
+      }
+
+      .module-content.collapsed {
+        display: none;
+      }
+
+      .api-item {
+        padding: 12px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: background 0.2s;
+      }
+
+      .api-item:hover {
+        background: #f8f9fa;
+      }
+
+      .api-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #667eea;
+      }
+
+      .method {
+        min-width: 60px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: bold;
+        text-align: center;
+        font-family: monospace;
+      }
+
+      .method.GET {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      .method.POST {
+        background: #d4edda;
+        color: #155724;
+      }
+      .method.PUT {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .method.DELETE {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .endpoint {
+        flex: 1;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        word-break: break-all;
+      }
+
+      .description {
+        color: #6c757d;
+        font-size: 13px;
+        min-width: 180px;
+      }
+
+      .priority {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+      }
+
+      .priority.High {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .priority.Medium {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .priority.Low {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+
+      @media (max-width: 768px) {
+        .api-item {
+          flex-wrap: wrap;
+        }
+        .description,
+        .priority {
+          margin-left: 36px;
+        }
+        .method,
+        .endpoint {
+          margin-left: 0;
+        }
+      }
+
+      .footer {
+        padding: 16px 40px;
+        background: #f8f9fa;
+        text-align: center;
+        font-size: 14px;
+        color: #6c757d;
+        border-top: 1px solid #e9ecef;
+      }
+
+      .btn-reset {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn-reset:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>
+          📋 E-commerce API Checklist
+          <span style="font-size: 14px">Interactive + Track Progress</span>
+        </h1>
+        <div class="stats">
+          <div class="stat-card">
+            <div class="number" id="totalCount">0</div>
+            <div class="label">Tổng số API</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" id="completedCount">0</div>
+            <div class="label">Đã hoàn thành</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" id="percentCount">0%</div>
+            <div class="label">Tiến độ</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="search-box">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍 Tìm kiếm API... (method, endpoint, mô tả)"
+          />
+        </div>
+        <div class="filter-buttons">
+          <button class="filter-btn active" data-filter="all">📋 Tất cả</button>
+          <button class="filter-btn" data-filter="High">🔥 Priority Cao</button>
+          <button class="filter-btn" data-filter="Medium">
+            ⚠️ Priority Trung bình
+          </button>
+          <button class="filter-btn" data-filter="Low">💤 Priority Thấp</button>
+          <button class="filter-btn" data-filter="completed">
+            ✅ Đã hoàn thành
+          </button>
+          <button class="filter-btn" data-filter="pending">
+            ⏳ Chưa hoàn thành
+          </button>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <button class="btn-reset" id="resetBtn">🔄 Reset tất cả</button>
+      </div>
+
+      <div class="checklist" id="checklistContainer"></div>
+      <div class="footer">
+        💡 Click vào module để thu gọn/mở rộng | Tự động lưu trạng thái checkbox
+        vào localStorage
+      </div>
+    </div>
+
+    <script>
+      // Dữ liệu API
+      const apiData = [
+        // Auth & User
+        {
+          module: "Xác thực & Người dùng",
+          method: "POST",
+          endpoint: "/auth/register",
+          description: "Đăng ký tài khoản",
+          priority: "High",
+        },
+        {
+          module: "Xác thực & Người dùng",
+          method: "POST",
+          endpoint: "/auth/login",
+          description: "Đăng nhập",
+          priority: "High",
+        },
+        {
+          module: "Xác thực & Người dùng",
+          method: "POST",
+          endpoint: "/auth/refresh-token",
+          description: "Làm mới token",
+          priority: "Medium",
+        },
+        {
+          module: "Xác thực & Người dùng",
+          method: "POST",
+          endpoint: "/auth/logout",
+          description: "Đăng xuất",
+          priority: "Medium",
+        },
+        {
+          module: "Xác thực & Người dùng",
+          method: "GET",
+          endpoint: "/auth/me",
+          description: "Lấy thông tin user hiện tại",
+          priority: "High",
+        },
+        {
+          module: "Xác thực & Người dùng",
+          method: "PUT",
+          endpoint: "/auth/me",
+          description: "Cập nhật thông tin user",
+          priority: "Medium",
+        },
+        {
+          module: "Xác thực & Người dùng",
+          method: "PUT",
+          endpoint: "/auth/change-password",
+          description: "Đổi mật khẩu",
+          priority: "High",
+        },
+        {
+          module: "Xác thực & Người dùng",
+          method: "POST",
+          endpoint: "/auth/forgot-password",
+          description: "Quên mật khẩu",
+          priority: "Medium",
+        },
+        {
+          module: "Xác thực & Người dùng",
+          method: "POST",
+          endpoint: "/auth/reset-password",
+          description: "Đặt lại mật khẩu",
+          priority: "Medium",
+        },
+        {
+          module: "Xác thực & Người dùng",
+          method: "GET",
+          endpoint: "/admin/users",
+          description: "(Admin) Danh sách user",
+          priority: "Low",
+        },
+        {
+          module: "Xác thực & Người dùng",
+          method: "PUT",
+          endpoint: "/admin/users/{id}/status",
+          description: "(Admin) Khóa/mở khóa",
+          priority: "Low",
+        },
+        // Product
+        {
+          module: "Quản lý sản phẩm",
+          method: "GET",
+          endpoint: "/products",
+          description: "Danh sách sản phẩm (lọc, phân trang)",
+          priority: "High",
+        },
+        {
+          module: "Quản lý sản phẩm",
+          method: "GET",
+          endpoint: "/products/{id}",
+          description: "Chi tiết sản phẩm",
+          priority: "High",
+        },
+        {
+          module: "Quản lý sản phẩm",
+          method: "GET",
+          endpoint: "/categories",
+          description: "Danh sách danh mục",
+          priority: "High",
+        },
+        {
+          module: "Quản lý sản phẩm",
+          method: "GET",
+          endpoint: "/categories/{id}/products",
+          description: "Sản phẩm theo danh mục",
+          priority: "High",
+        },
+        {
+          module: "Quản lý sản phẩm",
+          method: "POST",
+          endpoint: "/admin/products",
+          description: "(Admin) Thêm sản phẩm",
+          priority: "High",
+        },
+        {
+          module: "Quản lý sản phẩm",
+          method: "PUT",
+          endpoint: "/admin/products/{id}",
+          description: "(Admin) Cập nhật sản phẩm",
+          priority: "High",
+        },
+        {
+          module: "Quản lý sản phẩm",
+          method: "DELETE",
+          endpoint: "/admin/products/{id}",
+          description: "(Admin) Xóa sản phẩm",
+          priority: "High",
+        },
+        {
+          module: "Quản lý sản phẩm",
+          method: "POST",
+          endpoint: "/admin/products/{id}/images",
+          description: "(Admin) Upload ảnh",
+          priority: "Medium",
+        },
+        {
+          module: "Quản lý sản phẩm",
+          method: "DELETE",
+          endpoint: "/admin/products/{id}/images/{imageId}",
+          description: "(Admin) Xóa ảnh",
+          priority: "Low",
+        },
+        // Cart
+        {
+          module: "Giỏ hàng",
+          method: "GET",
+          endpoint: "/cart",
+          description: "Xem giỏ hàng",
+          priority: "High",
+        },
+        {
+          module: "Giỏ hàng",
+          method: "POST",
+          endpoint: "/cart/items",
+          description: "Thêm sản phẩm vào giỏ",
+          priority: "High",
+        },
+        {
+          module: "Giỏ hàng",
+          method: "PUT",
+          endpoint: "/cart/items/{itemId}",
+          description: "Cập nhật số lượng",
+          priority: "High",
+        },
+        {
+          module: "Giỏ hàng",
+          method: "DELETE",
+          endpoint: "/cart/items/{itemId}",
+          description: "Xóa 1 sản phẩm khỏi giỏ",
+          priority: "High",
+        },
+        {
+          module: "Giỏ hàng",
+          method: "DELETE",
+          endpoint: "/cart/clear",
+          description: "Xóa toàn bộ giỏ hàng",
+          priority: "Medium",
+        },
+        // Order & Payment
+        {
+          module: "Đơn hàng & Thanh toán",
+          method: "POST",
+          endpoint: "/orders",
+          description: "Tạo đơn hàng",
+          priority: "High",
+        },
+        {
+          module: "Đơn hàng & Thanh toán",
+          method: "GET",
+          endpoint: "/orders",
+          description: "Lịch sử đơn hàng",
+          priority: "High",
+        },
+        {
+          module: "Đơn hàng & Thanh toán",
+          method: "GET",
+          endpoint: "/orders/{id}",
+          description: "Chi tiết đơn hàng",
+          priority: "High",
+        },
+        {
+          module: "Đơn hàng & Thanh toán",
+          method: "PUT",
+          endpoint: "/orders/{id}/cancel",
+          description: "Hủy đơn hàng",
+          priority: "Medium",
+        },
+        {
+          module: "Đơn hàng & Thanh toán",
+          method: "POST",
+          endpoint: "/orders/{id}/payment",
+          description: "Tạo phiên thanh toán",
+          priority: "High",
+        },
+        {
+          module: "Đơn hàng & Thanh toán",
+          method: "GET",
+          endpoint: "/payment/callback",
+          description: "Webhook thanh toán",
+          priority: "High",
+        },
+        {
+          module: "Đơn hàng & Thanh toán",
+          method: "GET",
+          endpoint: "/payment/status/{orderId}",
+          description: "Kiểm tra trạng thái",
+          priority: "Medium",
+        },
+        {
+          module: "Đơn hàng & Thanh toán",
+          method: "GET",
+          endpoint: "/admin/orders",
+          description: "(Admin) Danh sách đơn",
+          priority: "Medium",
+        },
+        {
+          module: "Đơn hàng & Thanh toán",
+          method: "PUT",
+          endpoint: "/admin/orders/{id}/status",
+          description: "(Admin) Cập nhật trạng thái",
+          priority: "High",
+        },
+        // Review
+        {
+          module: "Đánh giá & Nhận xét",
+          method: "GET",
+          endpoint: "/products/{id}/reviews",
+          description: "Xem đánh giá",
+          priority: "Medium",
+        },
+        {
+          module: "Đánh giá & Nhận xét",
+          method: "POST",
+          endpoint: "/products/{id}/reviews",
+          description: "Tạo đánh giá",
+          priority: "Medium",
+        },
+        {
+          module: "Đánh giá & Nhận xét",
+          method: "PUT",
+          endpoint: "/reviews/{id}",
+          description: "Cập nhật đánh giá",
+          priority: "Low",
+        },
+        {
+          module: "Đánh giá & Nhận xét",
+          method: "DELETE",
+          endpoint: "/reviews/{id}",
+          description: "Xóa đánh giá",
+          priority: "Low",
+        },
+        {
+          module: "Đánh giá & Nhận xét",
+          method: "POST",
+          endpoint: "/reviews/{id}/like",
+          description: "Like/helpful",
+          priority: "Low",
+        },
+        // Coupon
+        {
+          module: "Mã giảm giá",
+          method: "GET",
+          endpoint: "/coupons/check",
+          description: "Kiểm tra mã giảm giá",
+          priority: "Medium",
+        },
+        {
+          module: "Mã giảm giá",
+          method: "POST",
+          endpoint: "/admin/coupons",
+          description: "(Admin) Tạo mã",
+          priority: "Low",
+        },
+        {
+          module: "Mã giảm giá",
+          method: "GET",
+          endpoint: "/admin/coupons",
+          description: "(Admin) Danh sách mã",
+          priority: "Low",
+        },
+        {
+          module: "Mã giảm giá",
+          method: "PUT",
+          endpoint: "/admin/coupons/{id}",
+          description: "(Admin) Cập nhật mã",
+          priority: "Low",
+        },
+        {
+          module: "Mã giảm giá",
+          method: "DELETE",
+          endpoint: "/admin/coupons/{id}",
+          description: "(Admin) Xóa mã",
+          priority: "Low",
+        },
+        // Search
+        {
+          module: "Tìm kiếm & Gợi ý",
+          method: "GET",
+          endpoint: "/search",
+          description: "Tìm kiếm sản phẩm",
+          priority: "High",
+        },
+        {
+          module: "Tìm kiếm & Gợi ý",
+          method: "GET",
+          endpoint: "/products/suggest",
+          description: "Gợi ý từ khóa",
+          priority: "Medium",
+        },
+        {
+          module: "Tìm kiếm & Gợi ý",
+          method: "GET",
+          endpoint: "/products/recommended",
+          description: "Gợi ý sản phẩm",
+          priority: "Low",
+        },
+        // Notification
+        {
+          module: "Thông báo",
+          method: "GET",
+          endpoint: "/notifications",
+          description: "Danh sách thông báo",
+          priority: "Low",
+        },
+        {
+          module: "Thông báo",
+          method: "PUT",
+          endpoint: "/notifications/{id}/read",
+          description: "Đánh dấu đã đọc",
+          priority: "Low",
+        },
+        {
+          module: "Thông báo",
+          method: "POST",
+          endpoint: "/admin/notifications",
+          description: "(Admin) Gửi thông báo",
+          priority: "Low",
+        },
+        // Admin & Stats
+        {
+          module: "Admin & Thống kê",
+          method: "GET",
+          endpoint: "/admin/dashboard/stats",
+          description: "Tổng quan",
+          priority: "Medium",
+        },
+        {
+          module: "Admin & Thống kê",
+          method: "GET",
+          endpoint: "/admin/dashboard/revenue",
+          description: "Doanh thu",
+          priority: "Medium",
+        },
+        {
+          module: "Admin & Thống kê",
+          method: "GET",
+          endpoint: "/admin/dashboard/top-products",
+          description: "Sản phẩm bán chạy",
+          priority: "Low",
+        },
+        // System
+        {
+          module: "Hệ thống & Tiện ích",
+          method: "GET",
+          endpoint: "/health",
+          description: "Health check",
+          priority: "Medium",
+        },
+        {
+          module: "Hệ thống & Tiện ích",
+          method: "GET",
+          endpoint: "/provinces",
+          description: "Danh sách tỉnh/thành",
+          priority: "Medium",
+        },
+        {
+          module: "Hệ thống & Tiện ích",
+          method: "GET",
+          endpoint: "/districts/{provinceId}",
+          description: "Quận/huyện",
+          priority: "Medium",
+        },
+        {
+          module: "Hệ thống & Tiện ích",
+          method: "POST",
+          endpoint: "/upload/image",
+          description: "Upload ảnh tạm",
+          priority: "Medium",
+        },
+      ];
+
+      // Load trạng thái từ localStorage
+      let completedState = {};
+      try {
+        const saved = localStorage.getItem("ecommerce_api_checklist");
+        if (saved) completedState = JSON.parse(saved);
+      } catch (e) {}
+
+      let currentFilter = "all";
+      let searchKeyword = "";
+
+      // Helper: tạo unique key cho mỗi API
+      function getApiKey(api) {
+        return `${api.module}|${api.method}|${api.endpoint}`;
+      }
+
+      function saveState() {
+        localStorage.setItem(
+          "ecommerce_api_checklist",
+          JSON.stringify(completedState),
+        );
+        updateStats();
+        renderChecklist();
+      }
+
+      function toggleComplete(key) {
+        completedState[key] = !completedState[key];
+        saveState();
+      }
+
+      function resetAll() {
+        completedState = {};
+        saveState();
+      }
+
+      function updateStats() {
+        const total = apiData.length;
+        const completed = apiData.filter(
+          (api) => completedState[getApiKey(api)] === true,
+        ).length;
+        const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+        document.getElementById("totalCount").innerText = total;
+        document.getElementById("completedCount").innerText = completed;
+        document.getElementById("percentCount").innerText = percent + "%";
+        document.getElementById("progressBar").style.width = percent + "%";
+      }
+
+      function getFilteredApis() {
+        let filtered = [...apiData];
+        // Lọc theo priority
+        if (
+          currentFilter !== "all" &&
+          currentFilter !== "completed" &&
+          currentFilter !== "pending"
+        ) {
+          filtered = filtered.filter((api) => api.priority === currentFilter);
+        } else if (currentFilter === "completed") {
+          filtered = filtered.filter(
+            (api) => completedState[getApiKey(api)] === true,
+          );
+        } else if (currentFilter === "pending") {
+          filtered = filtered.filter((api) => !completedState[getApiKey(api)]);
+        }
+
+        // Lọc theo search
+        if (searchKeyword.trim() !== "") {
+          const kw = searchKeyword.toLowerCase();
+          filtered = filtered.filter(
+            (api) =>
+              api.method.toLowerCase().includes(kw) ||
+              api.endpoint.toLowerCase().includes(kw) ||
+              api.description.toLowerCase().includes(kw) ||
+              api.module.toLowerCase().includes(kw),
+          );
+        }
+
+        return filtered;
+      }
+
+      // Nhóm theo module
+      function groupByModule(apis) {
+        const groups = {};
+        apis.forEach((api) => {
+          if (!groups[api.module]) groups[api.module] = [];
+          groups[api.module].push(api);
+        });
+        return groups;
+      }
+
+      // Collapse state cho module
+      let collapsedModules = {};
+      function toggleModule(moduleName) {
+        collapsedModules[moduleName] = !collapsedModules[moduleName];
+        renderChecklist();
+      }
+
+      function renderChecklist() {
+        const filtered = getFilteredApis();
+        const grouped = groupByModule(filtered);
+        const container = document.getElementById("checklistContainer");
+        container.innerHTML = "";
+
+        for (const [moduleName, apis] of Object.entries(grouped)) {
+          const totalModule = apis.length;
+          const completedModule = apis.filter(
+            (api) => completedState[getApiKey(api)] === true,
+          ).length;
+          const isCollapsed = collapsedModules[moduleName] || false;
+
+          const moduleDiv = document.createElement("div");
+          moduleDiv.className = "module";
+
+          moduleDiv.innerHTML = `
+                <div class="module-header" data-module="${moduleName}">
+                    <span>📁 ${moduleName} <span class="module-stats">(${completedModule}/${totalModule})</span></span>
+                    <span>${isCollapsed ? "▼" : "▲"}</span>
+                </div>
+                <div class="module-content ${isCollapsed ? "collapsed" : ""}">
+                    ${apis
+                      .map((api) => {
+                        const key = getApiKey(api);
+                        const isChecked = completedState[key] === true;
+                        return `
+                            <div class="api-item" data-key="${key}">
+                                <input type="checkbox" ${isChecked ? "checked" : ""} data-key="${key}">
+                                <span class="method ${api.method}">${api.method}</span>
+                                <span class="endpoint">${api.endpoint}</span>
+                                <span class="description">${api.description}</span>
+                                <span class="priority ${api.priority}">${api.priority}</span>
+                            </div>
+                        `;
+                      })
+                      .join("")}
+                </div>
+            `;
+
+          container.appendChild(moduleDiv);
+        }
+
+        // Gắn sự kiện cho checkbox
+        document
+          .querySelectorAll('.api-item input[type="checkbox"]')
+          .forEach((cb) => {
+            cb.addEventListener("change", (e) => {
+              e.stopPropagation();
+              const key = cb.getAttribute("data-key");
+              if (key) toggleComplete(key);
+            });
+          });
+
+        // Gắn sự kiện toggle module
+        document.querySelectorAll(".module-header").forEach((header) => {
+          header.addEventListener("click", (e) => {
+            const moduleName = header.getAttribute("data-module");
+            if (moduleName) toggleModule(moduleName);
+          });
+        });
+      }
+
+      // Xử lý filter & search
+      function applyFilters() {
+        renderChecklist();
+      }
+
+      // Event listeners
+      document.querySelectorAll(".filter-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".filter-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentFilter = btn.getAttribute("data-filter");
+          applyFilters();
+        });
+      });
+
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        searchKeyword = e.target.value;
+        applyFilters();
+      });
+
+      document.getElementById("resetBtn").addEventListener("click", () => {
+        if (confirm("Bạn có chắc muốn reset tất cả trạng thái API?")) {
+          resetAll();
+        }
+      });
+
+      // Khởi tạo
+      updateStats();
+      renderChecklist();
+    </script>
+  </body>
+</html>
